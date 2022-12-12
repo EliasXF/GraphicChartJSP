@@ -40,10 +40,12 @@ try {
         $result = $pdo->query($sql);
         if($result->rowCount() > 0) {
             $revenue = array();
+            $labelaxis = array();
             while($row = $result->fetch()){
                 //echo json_encode($row['COL 6']);
                 $revenue[] = $row["datapoint"];
-                $descriptionlabel = $row["descriptionlabel"];
+                $labelaxis[] = ucwords($row["labelaxis"]);
+                $descriptionlabel = ucwords($row["descriptionlabel"]);
                 $bgcolor = $row["bgcolor"];
                 $bordercolor = $row["bordercolor"];
             }
@@ -64,16 +66,23 @@ try {
      <canvas id="myChart"></canvas>
     </div>
 
+    <div class="buttonBox">
+        <button onclick="showData(5)">Mostrar 5 elementos</button>
+        <button onclick="showData(7)">Mostrar 7 elementos </button>
+        <button onclick="showData()">Restaurar data</button>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
 
     //Setup block 
     const revenue =<?php echo json_encode($revenue); ?>;
+    const labelaxis =<?php echo json_encode($labelaxis); ?>;
     const descriptionlabel =<?php echo json_encode($descriptionlabel); ?>;
     const bgcolor =<?php echo json_encode($bgcolor); ?>;
     const bordercolor =<?php echo json_encode($bordercolor); ?>;
     const data = {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', '8', '9', '10'],
+        labels: labelaxis,
         datasets: [{
             label: descriptionlabel,
             data: revenue,
@@ -101,6 +110,21 @@ try {
         document.getElementById('myChart'),
         config 
     );
+
+    function showData(num) {
+        const revenueSliced = revenue.slice(0, num);
+        const labelaxisSliced = labelaxis.slice(0, num);
+        myChart.data.datasets[0].data = revenueSliced;
+        myChart.data.labels = labelaxisSliced;
+        myChart.update();
+    };
+
+    function resetData() {
+        myChart.data.datasets[0].data = revenueSliced;
+        myChart.data.labels = labelaxisSliced;
+        myChart.update();
+    };
+
     </script>
 
 </body>
